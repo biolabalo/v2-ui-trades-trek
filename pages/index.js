@@ -2,6 +2,7 @@ import React from "react";
 import { ArrowLeft } from "lucide-react";
 import axiosInstance from "../axios";
 import { useForm } from "react-hook-form";
+import { useRouter } from 'next/router';
 
 const CreateAccountForm = () => {
   const {
@@ -9,11 +10,13 @@ const CreateAccountForm = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const router = useRouter();
 
   const onSubmit = async (data) => {
     try {
       const response = await axiosInstance.post("/auth/signup", data);
       alert(response?.data?.data?.message)
+      router.push('/otp')
     } catch (error) {
       console.error("Error:", error);
     }
@@ -45,7 +48,7 @@ const CreateAccountForm = () => {
               className="w-full p-2 bg-gray-800 rounded"
             />
 
-            {errors.first_name && <p  className="text-red">{errors.first_name.message}</p>}
+            {errors.first_name && <p  className="text-red-600">{errors.first_name.message}</p>}
           </div>
 
           <div className="mb-4">
@@ -59,7 +62,7 @@ const CreateAccountForm = () => {
               placeholder="Enter Last Name"
               className="w-full p-2 bg-gray-800 rounded"
             />
-            {errors.last_name && <p className="text-red">{errors.last_name.message}</p>}
+            {errors.last_name && <p className="text-red-600">{errors.last_name.message}</p>}
           </div>
 
           <div className="mb-4">
@@ -80,7 +83,7 @@ const CreateAccountForm = () => {
               className="w-full p-2 bg-gray-800 rounded"
             />
 
-            {errors.email && <p className="text-red">{errors.email.message}</p>}
+            {errors.email && <p className="text-red-600">{errors.email.message}</p>}
           </div>
 
           <div className="mb-4">
@@ -94,7 +97,7 @@ const CreateAccountForm = () => {
               placeholder="Enter Password"
               className="w-full p-2 bg-gray-800 rounded"
             />
-            {errors.password && <p className="text-red">{errors.password.message}</p>}
+            {errors.password && <p className="text-red-600">{errors.password.message}</p>}
           </div>
 
           <div className="mb-6">
