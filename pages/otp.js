@@ -77,7 +77,7 @@ const VerificationCodeInput = () => {
         </div>
 
         <p className="mb-6">
-          Enter the One-time 6-digit code sent to you at {email && `${email.slice(0, 1)}***${email.slice(-11)}`}
+          Enter the One-time 6-digit code sent to you at {email}
         </p>
 
         <div className="bg-gray-800 p-4 rounded-lg mb-6">
