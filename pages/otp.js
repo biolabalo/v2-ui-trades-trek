@@ -62,7 +62,7 @@ const VerificationCodeInput = () => {
             ))}
           </div>
           <p className="text-center text-gray-400">
-            Didn't get the code? Resend in {timer} secs
+            Did not get the code? Resend in {timer} secs
           </p>
         </div>
 
