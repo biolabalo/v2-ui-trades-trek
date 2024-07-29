@@ -16,6 +16,7 @@ const CreateAccountForm = () => {
     try {
       const response = await axiosInstance.post("/auth/signup", data);
       alert(response?.data?.data?.message)
+      localStorage.setItem('email', data?.email)
       router.push('/otp')
     } catch (error) {
       console.error("Error:", error);

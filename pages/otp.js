@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import axiosInstance from '../axios';
+import { useRouter } from 'next/router';
 
 const VerificationCodeInput = () => {
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(58);
   const [clipboard, setClipboard] = useState('');
+  const [email, setEmail] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
+    // Retrieve email from localStorage
+    const storedEmail = localStorage.getItem('email');
+    if (storedEmail) {
+      setEmail(storedEmail);
+    }
+
     const interval = setInterval(() => {
       setTimer((prevTimer) => (prevTimer > 0 ? prevTimer - 1 : 0));
     }, 1000);
@@ -18,6 +28,11 @@ const VerificationCodeInput = () => {
     const newCode = [...code];
     newCode[index] = value;
     setCode(newCode);
+
+    // If all digits are filled, send the verification request
+    if (newCode.every(digit => digit !== '')) {
+      verifyOTP(newCode.join(''));
+    }
   };
 
   const handleKeyPress = (key) => {
@@ -34,18 +49,35 @@ const VerificationCodeInput = () => {
     }
   };
 
+  const verifyOTP = async (otp) => {
+    try {
+      const response = await axiosInstance.post('/auth/verify-user', {
+        email: email,
+        otp: otp
+      });
+      alert(response?.data?.message || 'Verification successful');
+      // Redirect to the next page or handle successful verification
+      router.push('/dashboard'); // Adjust the route as needed
+    } catch (error) {
+      console.error('Verification error:', error);
+      alert(error?.response?.data?.message || 'Verification failed. Please try again.');
+      // Reset the OTP input
+      setCode(['', '', '', '', '', '']);
+    }
+  };
+
   return (
     <div className="bg-gray-900 text-white min-h-screen p-4">
       <div className="max-w-md mx-auto">
         <div className="flex items-center mb-6">
-          <button className="mr-4">
+          <button className="mr-4" onClick={() => router.back()}>
             <ArrowLeft size={24} />
           </button>
           <h1 className="text-2xl font-bold">Verification</h1>
         </div>
 
         <p className="mb-6">
-          Enter the One-time 6-digit code sent to you at o***11@gmail.com
+          Enter the One-time 6-digit code sent to you at {email && `${email.slice(0, 1)}***${email.slice(-11)}`}
         </p>
 
         <div className="bg-gray-800 p-4 rounded-lg mb-6">
