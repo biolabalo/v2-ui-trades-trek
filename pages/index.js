@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import axiosInstance from "../axios";
 import { useForm } from "react-hook-form";
 import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
 
 const CreateAccountForm = () => {
   const {
@@ -15,8 +16,8 @@ const CreateAccountForm = () => {
   const onSubmit = async (data) => {
     try {
       const response = await axiosInstance.post("/auth/signup", data);
-      alert(response?.data?.data?.message)
-      localStorage.setItem('email', data?.email)
+      toast.success(response?.data?.data?.message)
+      localStorage.setItem('signup_email_verification', data?.email)
       router.push('/otp')
     } catch (error) {
       console.error("Error:", error);

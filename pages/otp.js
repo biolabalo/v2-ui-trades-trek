@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import axiosInstance from '../axios';
 import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
 
 const VerificationCodeInput = () => {
   const [code, setCode] = useState(['', '', '', '', '', '']);
@@ -12,7 +13,7 @@ const VerificationCodeInput = () => {
 
   useEffect(() => {
     // Retrieve email from localStorage
-    const storedEmail = localStorage.getItem('email');
+    const storedEmail = localStorage.getItem('signup_email_verification');
     if (storedEmail) {
       setEmail(storedEmail);
     }
@@ -55,12 +56,12 @@ const VerificationCodeInput = () => {
         email: email,
         otp: otp
       });
-      alert(response?.data?.message || 'Verification successful');
+      toast.success(response?.data?.message || 'Verification successful');
       // Redirect to the next page or handle successful verification
       router.push('/dashboard'); // Adjust the route as needed
     } catch (error) {
       console.error('Verification error:', error);
-      alert(error?.response?.data?.message || 'Verification failed. Please try again.');
+      toast.error(error?.response?.data?.message || 'Verification failed. Please try again.');
       // Reset the OTP input
       setCode(['', '', '', '', '', '']);
     }
@@ -93,15 +94,10 @@ const VerificationCodeInput = () => {
               />
             ))}
           </div>
-          <p className="text-center text-gray-400">
-            Did not get the code? Resend in {timer} secs
-          </p>
+
         </div>
 
-        <div className="bg-gray-800 p-2 rounded-lg mb-6">
-          <p className="text-center text-gray-400">Copied on clipboard</p>
-          <p className="text-center text-xl">{clipboard}</p>
-        </div>
+   
 
         <div className="grid grid-cols-3 gap-2">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
