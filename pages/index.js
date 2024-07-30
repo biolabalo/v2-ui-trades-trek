@@ -87,7 +87,7 @@ const LoginForm = () => {
           >
             {isLoading ? (
               <>
-                <Loader className="animate-spin mr-2" size={20} />
+             
                 Logging in...
               </>
             ) : (
