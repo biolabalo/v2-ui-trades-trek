@@ -1,69 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
-import axiosInstance from '../axios';
+import React, { useState } from "react";
+import { ArrowLeft, Loader } from "lucide-react";
+import axiosInstance from "../axios";
 import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
+import Link from 'next/link';
 
-const VerificationCodeInput = () => {
-  const [code, setCode] = useState(['', '', '', '', '', '']);
-  const [timer, setTimer] = useState(58);
-  const [clipboard, setClipboard] = useState('');
-  const [email, setEmail] = useState('');
+const OTPVerificationForm = () => {
+  const [otp, setOtp] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    // Retrieve email from localStorage
-    const storedEmail = localStorage.getItem('signup_email_verification');
-    if (storedEmail) {
-      setEmail(storedEmail);
-    }
+  const handleChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+    setOtp(value);
 
-    const interval = setInterval(() => {
-      setTimer((prevTimer) => (prevTimer > 0 ? prevTimer - 1 : 0));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleCodeChange = (index, value) => {
-    const newCode = [...code];
-    newCode[index] = value;
-    setCode(newCode);
-
-    // If all digits are filled, send the verification request
-    if (newCode.every(digit => digit !== '')) {
-      verifyOTP(newCode.join(''));
+    if (value.length === 6) {
+      handleSubmit(value);
     }
   };
 
-  const handleKeyPress = (key) => {
-    const emptyIndex = code.findIndex((digit) => digit === '');
-    if (emptyIndex !== -1) {
-      handleCodeChange(emptyIndex, key);
-    }
-  };
-
-  const handleBackspace = () => {
-    const lastFilledIndex = code.findLastIndex((digit) => digit !== '');
-    if (lastFilledIndex !== -1) {
-      handleCodeChange(lastFilledIndex, '');
-    }
-  };
-
-  const verifyOTP = async (otp) => {
+  const handleSubmit = async (value) => {
+    setIsLoading(true);
     try {
-      const response = await axiosInstance.post('/auth/verify-user', {
-        email: email,
-        otp: otp
-      });
-      toast.success(response?.data?.message || 'Verification successful');
-      // Redirect to the next page or handle successful verification
-      router.push('/dashboard'); // Adjust the route as needed
+      const email = localStorage.getItem('signup_email_verification');
+      const response = await axiosInstance.post("/auth/verify-otp", { email, otp: value });
+      toast.success(response?.data?.data?.message || "OTP verified successfully");
+      router.push('/dashboard'); // Adjust this route as needed
     } catch (error) {
-      console.error('Verification error:', error);
-      toast.error(error?.response?.data?.message || 'Verification failed. Please try again.');
-      // Reset the OTP input
-      setCode(['', '', '', '', '', '']);
+      console.error("Error:", error);
+      toast.error(error?.response?.data?.message || "OTP verification failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -71,63 +38,52 @@ const VerificationCodeInput = () => {
     <div className="bg-gray-900 text-white min-h-screen p-4">
       <div className="max-w-md mx-auto">
         <div className="flex items-center mb-6">
-          <button className="mr-4" onClick={() => router.back()}>
+          <button className="mr-4" onClick={() => router.back()} disabled={isLoading}>
             <ArrowLeft size={24} />
           </button>
-          <h1 className="text-2xl font-bold">Verification</h1>
+          <h1 className="text-2xl font-bold">Verify OTP</h1>
         </div>
 
         <p className="mb-6">
-          Enter the One-time 6-digit code sent to you at {email}
+          Please enter the 6-digit OTP sent to your email
         </p>
 
-        <div className="bg-gray-800 p-4 rounded-lg mb-6">
-          <div className="flex justify-between mb-4">
-            {code.map((digit, index) => (
-              <input
-                key={index}
-                type="text"
-                maxLength="1"
-                value={digit}
-                onChange={(e) => handleCodeChange(index, e.target.value)}
-                className="w-12 h-12 text-center bg-transparent border-2 border-gray-700 rounded"
-              />
-            ))}
+        <div className="mb-6">
+          <label htmlFor="otp" className="block mb-2">
+            OTP
+          </label>
+          <input
+            type="text"
+            id="otp"
+            value={otp}
+            onChange={handleChange}
+            placeholder="Enter 6-digit OTP"
+            className="w-full p-2 bg-gray-800 rounded text-center text-2xl tracking-widest"
+            disabled={isLoading}
+            maxLength={6}
+          />
+        </div>
+
+        {isLoading && (
+          <div className="flex justify-center items-center mb-4">
+            <Loader className="animate-spin mr-2" size={20} />
+            <span>Verifying...</span>
           </div>
+        )}
 
-        </div>
-
-   
-
-        <div className="grid grid-cols-3 gap-2">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-            <button
-              key={num}
-              onClick={() => handleKeyPress(num.toString())}
-              className="bg-gray-700 rounded-lg p-4 text-center"
-            >
-              <div className="text-xl">{num}</div>
-              <div className="text-xs text-gray-400">
-                {num === 1 ? '' : num === 2 ? 'ABC' : num === 3 ? 'DEF' : num === 4 ? 'GHI' : num === 5 ? 'JKL' : num === 6 ? 'MNO' : num === 7 ? 'PQRS' : num === 8 ? 'TUV' : 'WXYZ'}
-              </div>
-            </button>
-          ))}
-          <button
-            onClick={() => handleKeyPress('0')}
-            className="bg-gray-700 rounded-lg p-4 text-center"
-          >
-            <div className="text-xl">0</div>
-          </button>
-          <button
-            onClick={handleBackspace}
-            className="bg-gray-700 rounded-lg p-4 text-center"
-          >
-            <div className="text-xl">⌫</div>
-          </button>
-        </div>
+        <p className="text-center mt-4">
+          Did not receive the OTP?{" "}
+          <Link href="#" className="text-purple-400" onClick={(e) => {
+            e.preventDefault();
+            // Add logic to resend OTP
+            toast.info("OTP resent to your email");
+          }}>
+            Resend OTP
+          </Link>
+        </p>
       </div>
     </div>
   );
 };
 
-export default VerificationCodeInput;
+export default OTPVerificationForm;

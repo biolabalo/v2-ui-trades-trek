@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import axiosInstance from "../axios";
 import { useForm } from "react-hook-form";
@@ -13,17 +13,21 @@ const LoginForm = () => {
     formState: { errors },
   } = useForm();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
 
   const onSubmit = async (data) => {
+    setIsLoading(true);
     try {
       const response = await axiosInstance.post("/auth/login", data);
-      console.log(response, '> >>')
       toast.success("Login successful");
       // Handle successful login (e.g., store token, redirect)
       router.push('/dashboard');
     } catch (error) {
       console.error("Error:", error);
       toast.error("Login failed. Please check your credentials.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -78,9 +82,17 @@ const LoginForm = () => {
 
           <button
             type="submit"
-            className="w-full bg-purple-500 text-white py-2 rounded mb-4"
+            className="w-full bg-purple-500 text-white py-2 rounded mb-4 flex items-center justify-center"
+            disabled={isLoading}
           >
-            Login
+            {isLoading ? (
+              <>
+                <Loader className="animate-spin mr-2" size={20} />
+                Logging in...
+              </>
+            ) : (
+              'Login'
+            )}
           </button>
         </form>
 

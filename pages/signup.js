@@ -4,6 +4,7 @@ import axiosInstance from "../axios";
 import { useForm } from "react-hook-form";
 import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
+import Link from 'next/link';
 
 const CreateAccountForm = () => {
   const {
@@ -136,9 +137,9 @@ const CreateAccountForm = () => {
 
         <p className="text-center">
           Are you an existing user?{" "}
-          <a href="#" className="text-purple-400">
-            Sign in
-          </a>
+          <Link href="/signup" className="text-purple-400">
+            Login
+          </Link>
         </p>
       </div>
     </div>
