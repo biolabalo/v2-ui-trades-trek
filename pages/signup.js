@@ -137,7 +137,7 @@ const CreateAccountForm = () => {
 
         <p className="text-center">
           Are you an existing user?{" "}
-          <Link href="/signup" className="text-purple-400">
+          <Link href="/" className="text-purple-400">
             Login
           </Link>
         </p>
