@@ -19,7 +19,7 @@ const CreateAccountForm = () => {
       const response = await axiosInstance.post("/auth/signup", data);
       toast.success(response?.data?.data?.message)
       localStorage.setItem('signup_email_verification', data?.email)
-      router.push('/otp')
+      router.push('/dashboard')
     } catch (error) {
       console.error("Error:", error);
     }
