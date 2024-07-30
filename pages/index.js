@@ -4,8 +4,9 @@ import axiosInstance from "../axios";
 import { useForm } from "react-hook-form";
 import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
+import Link from 'next/link';
 
-const CreateAccountForm = () => {
+const LoginForm = () => {
   const {
     register,
     handleSubmit,
@@ -15,12 +16,14 @@ const CreateAccountForm = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axiosInstance.post("/auth/signup", data);
-      toast.success(response?.data?.data?.message)
-      localStorage.setItem('signup_email_verification', data?.email)
-      router.push('/otp')
+      const response = await axiosInstance.post("/auth/login", data);
+      console.log(response, '> >>')
+      toast.success("Login successful");
+      // Handle successful login (e.g., store token, redirect)
+      router.push('/dashboard');
     } catch (error) {
       console.error("Error:", error);
+      toast.error("Login failed. Please check your credentials.");
     }
   };
 
@@ -31,42 +34,14 @@ const CreateAccountForm = () => {
           <button className="mr-4">
             <ArrowLeft size={24} />
           </button>
-          <h1 className="text-2xl font-bold">Create Account</h1>
+          <h1 className="text-2xl font-bold">Login</h1>
         </div>
 
         <p className="mb-6">
-          Kindly provide the following details to get started
+          Please enter your email and password to login
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="mb-4">
-            <label htmlFor="firstName" className="block mb-2">
-              First Name
-            </label>
-            <input
-              id="firstName"
-              {...register("first_name", { required: "First Name is required" })}
-              placeholder="Enter first Name"
-              className="w-full p-2 bg-gray-800 rounded"
-            />
-
-            {errors.first_name && <p  className="text-red-600">{errors.first_name.message}</p>}
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="last_name" className="block mb-2">
-              Last Name
-            </label>
-            <input
-              type="text"
-              id="lastName"
-              {...register("last_name", { required: "Last Name is required" })}
-              placeholder="Enter Last Name"
-              className="w-full p-2 bg-gray-800 rounded"
-            />
-            {errors.last_name && <p className="text-red-600">{errors.last_name.message}</p>}
-          </div>
-
           <div className="mb-4">
             <label htmlFor="email" className="block mb-2">
               Email Address
@@ -84,11 +59,10 @@ const CreateAccountForm = () => {
               placeholder="youremail@example.com"
               className="w-full p-2 bg-gray-800 rounded"
             />
-
             {errors.email && <p className="text-red-600">{errors.email.message}</p>}
           </div>
 
-          <div className="mb-4">
+          <div className="mb-6">
             <label htmlFor="password" className="block mb-2">
               Password
             </label>
@@ -102,47 +76,23 @@ const CreateAccountForm = () => {
             {errors.password && <p className="text-red-600">{errors.password.message}</p>}
           </div>
 
-          <div className="mb-6">
-            <label htmlFor="referralCode" className="block mb-2">
-              Referral Code (Optional)
-            </label>
-            <input
-              type="text"
-              id="referralCode"
-              {...register("referralCode")}
-              placeholder="Enter code here"
-              className="w-full p-2 bg-gray-800 rounded"
-            />
-          </div>
-
-          <p className="mb-4 text-sm">
-            By clicking proceed, you agree to our{" "}
-            <a href="#" className="text-emerald-400">
-              terms of service
-            </a>{" "}
-            and{" "}
-            <a href="#" className="text-emerald-400">
-              privacy policy
-            </a>
-          </p>
-
           <button
             type="submit"
             className="w-full bg-purple-500 text-white py-2 rounded mb-4"
           >
-            Proceed
+            Login
           </button>
         </form>
 
         <p className="text-center">
-          Are you an existing user?{" "}
-          <a href="#" className="text-purple-400">
-            Sign in
-          </a>
+          Don't have an account?{" "}
+          <Link href="/signup" className="text-purple-400">
+            Sign up
+          </Link>
         </p>
       </div>
     </div>
   );
 };
 
-export default CreateAccountForm;
+export default LoginForm;
