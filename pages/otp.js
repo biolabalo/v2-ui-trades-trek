@@ -45,7 +45,7 @@ const OTPVerificationForm = () => {
         response?.data?.data?.message || "OTP verified successfully"
       );
       localStorage.removeItem("signup_email_verification");
-      router.push("/dashboard"); // Adjust this route as needed
+      router.push("/login"); // Adjust this route as needed
     } catch (error) {
       console.error("Error:", error);
       toast.error(error?.response?.data?.message || "OTP verification failed");
