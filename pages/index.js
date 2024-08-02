@@ -20,9 +20,17 @@ const LoginForm = () => {
     setIsLoading(true);
     try {
       const response = await axiosInstance.post("/auth/login", data);
-      toast.success("Login successful");
-      // Handle successful login (e.g., store token, redirect)
-      router.push('/dashboard');
+      const userData = response?.data?.data;
+      if (userData) {
+        // Save token to localStorage
+        localStorage.setItem('accessToken', userData.access_token);
+        
+        // Update axios instance with new token
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${userData.access_token}`;
+        
+        toast.success("Login successful");
+        router.push('/dashboard');
+      }
     } catch (error) {
       console.error("Error:", error);
       toast.error("Login failed. Please check your credentials.");

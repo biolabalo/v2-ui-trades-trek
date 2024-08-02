@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import axiosInstance from "../axios";
 import { useForm } from "react-hook-form";
-import { useRouter } from 'next/router';
-import { toast } from 'react-toastify';
-import Link from 'next/link';
+import { useRouter } from "next/router";
+import { toast } from "react-toastify";
+import Link from "next/link";
 
 const CreateAccountForm = () => {
   const {
@@ -13,15 +13,26 @@ const CreateAccountForm = () => {
     formState: { errors },
   } = useForm();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (data) => {
+    setIsLoading(true);
     try {
       const response = await axiosInstance.post("/auth/signup", data);
-      toast.success(response?.data?.data?.message)
-      localStorage.setItem('signup_email_verification', data?.email)
-      router.push('/dashboard')
+
+      if(response?.data?.success){
+        toast.success(response?.data?.data?.message);
+        localStorage.setItem("signup_email_verification", data?.email);
+        router.push("/otp");
+      }
+     
     } catch (error) {
+      if (error?.response?.data?.errors) {
+        toast.error(error?.response?.data?.errors);
+      }
       console.error("Error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -46,12 +57,16 @@ const CreateAccountForm = () => {
             </label>
             <input
               id="firstName"
-              {...register("first_name", { required: "First Name is required" })}
+              {...register("first_name", {
+                required: "First Name is required",
+              })}
               placeholder="Enter first Name"
               className="w-full p-2 bg-gray-800 rounded"
             />
 
-            {errors.first_name && <p  className="text-red-600">{errors.first_name.message}</p>}
+            {errors.first_name && (
+              <p className="text-red-600">{errors.first_name.message}</p>
+            )}
           </div>
 
           <div className="mb-4">
@@ -65,7 +80,9 @@ const CreateAccountForm = () => {
               placeholder="Enter Last Name"
               className="w-full p-2 bg-gray-800 rounded"
             />
-            {errors.last_name && <p className="text-red-600">{errors.last_name.message}</p>}
+            {errors.last_name && (
+              <p className="text-red-600">{errors.last_name.message}</p>
+            )}
           </div>
 
           <div className="mb-4">
@@ -86,7 +103,9 @@ const CreateAccountForm = () => {
               className="w-full p-2 bg-gray-800 rounded"
             />
 
-            {errors.email && <p className="text-red-600">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="text-red-600">{errors.email.message}</p>
+            )}
           </div>
 
           <div className="mb-4">
@@ -100,7 +119,9 @@ const CreateAccountForm = () => {
               placeholder="Enter Password"
               className="w-full p-2 bg-gray-800 rounded"
             />
-            {errors.password && <p className="text-red-600">{errors.password.message}</p>}
+            {errors.password && (
+              <p className="text-red-600">{errors.password.message}</p>
+            )}
           </div>
 
           <div className="mb-6">
@@ -129,9 +150,36 @@ const CreateAccountForm = () => {
 
           <button
             type="submit"
-            className="w-full bg-purple-500 text-white py-2 rounded mb-4"
+            className="w-full bg-purple-500 text-white py-2 rounded mb-4 flex items-center justify-center"
+            disabled={isLoading}
           >
-            Proceed
+            {isLoading ? (
+              <>
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Creating Account...
+              </>
+            ) : (
+              "Proceed"
+            )}
           </button>
         </form>
 
