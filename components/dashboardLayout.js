@@ -6,22 +6,41 @@ import {
   BookOpen,
   Wallet,
   Trophy,
+  LogOut,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 
+const logOut = "Log out";
 
-const SidebarItem = ({ icon, text, active,to }) => (
+const SidebarItem = ({ icon, text, to }) => {
+  const router = useRouter();
+  const isActive = router.pathname === to;
+
+  return text === logOut ? (
+    <div
+      className={`flex items-center p-2 cursor-pointer rounded-lg mb-2 hover:bg-red-600`}
+      onClick={() => {
+        localStorage.removeItem('accessToken')
+        router.push('/')
+      }}
+    >
+      {icon}
+      <span className="ml-3">{text}</span>
+    </div>
+  ) : (
     <Link
-    href={to}
+      href={to}
       className={`flex items-center p-2 rounded-lg mb-2 ${
-        active ? "bg-purple-600" : "hover:bg-gray-700"
+        isActive ? "bg-purple-600" : "hover:bg-gray-700"
       }`}
     >
       {icon}
       <span className="ml-3">{text}</span>
     </Link>
   );
+};
 
 const DashboardLayout = ({ children }) => {
   const [userData, setUserData] = useState(null);
@@ -58,23 +77,26 @@ const DashboardLayout = ({ children }) => {
           <span className="font-semibold">Hello {userData?.full_name}</span>
         </div>
         <nav>
-          <SidebarItem icon={<Home />} text="Home" active to='/dashboard' />
-          <SidebarItem icon={<BarChart2 />} text="Trade" to='/dashboard/trade' />
-          <SidebarItem icon={<BookOpen />} text="Learn" to='/dashboard/learn' />
-          <SidebarItem icon={<Wallet />} text="Wallet" to='/dashboard/wallet' />
-          <SidebarItem icon={<Trophy />} text="Competition" to='/comp' />
+          <SidebarItem icon={<Home />} text="Home" active to="/dashboard" />
+          <SidebarItem
+            icon={<BarChart2 />}
+            text="Trade"
+            to="/dashboard/trade"
+          />
+          <SidebarItem icon={<BookOpen />} text="Learn" to="/dashboard/learn" />
+          <SidebarItem icon={<Wallet />} text="Wallet" to="/dashboard/wallet" />
+          <SidebarItem
+            icon={<Trophy />}
+            text="Competition"
+            to="/dashboard/competition"
+          />
+          <SidebarItem icon={<LogOut />} text={logOut} to="/login" />
         </nav>
       </div>
 
-     
-      <div className="flex-1 p-8 overflow-y-auto">
-        {children}
-      </div>
+      <div className="flex-1 p-8 overflow-y-auto">{children}</div>
     </div>
   );
 };
 
 export default DashboardLayout;
-
-
-  
