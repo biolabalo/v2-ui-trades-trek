@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: 'https://mobile-v2-biola-1.onrender.com/v2',
+  baseURL: 'http://localhost:3000/v2',
   headers: {
     'trades-trek-version': '2.0',
     dm: 'tt_web_app',
