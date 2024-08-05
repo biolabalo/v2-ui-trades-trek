@@ -37,7 +37,7 @@ const OTPVerificationForm = () => {
       if (!email) {
         throw new Error("Email not found");
       }
-      const response = await axiosInstance.post("/auth/verify-otp", {
+      const response = await axiosInstance.post("/auth/verify-user", {
         email,
         otp: value,
       });
