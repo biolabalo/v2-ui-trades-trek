@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import axiosInstance from "../axios";
 import { useForm } from "react-hook-form";
-import { useRouter } from 'next/router';
-import { toast } from 'react-toastify';
-import Link from 'next/link';
+import { useRouter } from "next/router";
+import { toast } from "react-toastify";
+import Link from "next/link";
 
 const LoginForm = () => {
   const {
@@ -15,21 +15,27 @@ const LoginForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
       const response = await axiosInstance.post("/auth/login", data);
       const userData = response?.data?.data;
       if (userData) {
+        if (!userData.is_verified) {
+          localStorage.setItem("signup_email_verification", data?.email);
+          router.push("/otp");
+          return;
+        }
         // Save token to localStorage
-        localStorage.setItem('accessToken', userData.access_token);
-        
+        localStorage.setItem("accessToken", userData.access_token);
+
         // Update axios instance with new token
-        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${userData.access_token}`;
-        
+        axiosInstance.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${userData.access_token}`;
+
         toast.success("Login successful");
-        router.push('/dashboard');
+        router.push("/dashboard");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -49,9 +55,7 @@ const LoginForm = () => {
           <h1 className="text-2xl font-bold">Login</h1>
         </div>
 
-        <p className="mb-6">
-          Please enter your email and password to login
-        </p>
+        <p className="mb-6">Please enter your email and password to login</p>
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
@@ -71,7 +75,9 @@ const LoginForm = () => {
               placeholder="youremail@example.com"
               className="w-full p-2 bg-gray-800 rounded"
             />
-            {errors.email && <p className="text-red-600">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="text-red-600">{errors.email.message}</p>
+            )}
           </div>
 
           <div className="mb-6">
@@ -85,7 +91,9 @@ const LoginForm = () => {
               placeholder="Enter Password"
               className="w-full p-2 bg-gray-800 rounded"
             />
-            {errors.password && <p className="text-red-600">{errors.password.message}</p>}
+            {errors.password && (
+              <p className="text-red-600">{errors.password.message}</p>
+            )}
           </div>
 
           <button
@@ -93,14 +101,7 @@ const LoginForm = () => {
             className="w-full bg-purple-500 text-white py-2 rounded mb-4 flex items-center justify-center"
             disabled={isLoading}
           >
-            {isLoading ? (
-              <>
-             
-                Logging in...
-              </>
-            ) : (
-              'Login'
-            )}
+            {isLoading ? <>Logging in...</> : "Login"}
           </button>
         </form>
 
