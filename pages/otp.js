@@ -41,11 +41,29 @@ const OTPVerificationForm = () => {
         email,
         otp: value,
       });
-      toast.success(
-        response?.data?.data?.message || "OTP verified successfully"
-      );
-      localStorage.removeItem("signup_email_verification");
-      router.push("/"); // Adjust this route as needed
+      const userData = response?.data?.data;
+  
+
+      if (userData) {
+        if (!userData.is_verified) {
+          return;
+        }
+     
+        localStorage.setItem("accessToken", userData.access_token);
+        axiosInstance.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${userData.access_token}`;
+
+        toast.success(
+          response?.data?.data?.message || "OTP verified successfully"
+        );
+        router.push("/dashboard");
+        localStorage.removeItem("signup_email_verification");
+  
+      }
+
+
+
     } catch (error) {
       console.error("Error:", error);
       toast.error(error?.response?.data?.message || "OTP verification failed");
