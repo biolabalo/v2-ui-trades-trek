@@ -16,9 +16,9 @@ const OTPVerificationForm = () => {
       router.push("/signup");
     }
 
-    return () => {
-      localStorage.removeItem("signup_email_verification");
-    };
+    // return () => {
+    //   localStorage.removeItem("signup_email_verification");
+    // };
   }, []);
 
   const handleChange = (e) => {
